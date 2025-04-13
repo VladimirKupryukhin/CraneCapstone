@@ -1,9 +1,19 @@
 #include "pico/stdlib.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "../include/myADC.h"
+#include "../include/constants.h"
 
 
 
+void initPins(){
+    
+    gpio_init(PIN_V_ADC_CS);
+    gpio_init(PIN_DUT1_RTD_ADC_CS);
+    gpio_init(PIN_DUT2_RTD_ADC_CS);
+    gpio_init(PIN_DUT3_RTD_ADC_CS);
+
+}
 
 
 int main () {
