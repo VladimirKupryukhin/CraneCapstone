@@ -4,6 +4,7 @@
 #include "../include/constants.h"
 #include "pico/stdlib.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 
 struct ADC_RESULT {

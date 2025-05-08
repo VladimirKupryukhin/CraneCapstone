@@ -26,6 +26,8 @@ pico_enable_stdio_uart(${PROJECT_NAME} 0)
 # Pull in our pico_stdlib which pulls in commonly used features (gpio, timer-delay etc)
 target_link_libraries(${PROJECT_NAME}
     pico_stdlib
+    hardware_gpio
+    hardware_pwm
+    hardware_adc
 )
-
 
