@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from itertools import count
+from matplotlib.pyplot import figure
 
 
 class App(tkinter.Tk):
@@ -41,12 +42,36 @@ class App(tkinter.Tk):
         
         index = count()
         
-        canvas = FigureCanvasTkAgg(plt.gcf(), master=self)
+        
+        
+        aFigure = plt.figure(figsize=(5, 5), dpi=80)
+        canvas = FigureCanvasTkAgg(aFigure, master=self)
         canvas.get_tk_widget().grid(row=2, column=0)
-        plt.gcf().subplots(1, 1)
-        plt.cla()
-        plt.plot(x_vals, y_vals)
-        #plt.show(block=False)
+        a = plt.gcf().subplots(1)
+        
+        a.cla()
+        a.plot(x_vals, y_vals)
+        aFigure.suptitle("SMRT1 Temperature")
+        
+        bFigure = plt.figure(figsize=(5, 5), dpi=80)
+        canvas2 = FigureCanvasTkAgg(bFigure, master=self)
+        canvas2.get_tk_widget().grid(row=2, column=1)
+        b = plt.gcf().subplots(1)
+        
+        b.cla()
+        b.plot(y_vals, x_vals)
+        bFigure.suptitle("SMRT2 Temperature")
+        
+        cFigure = plt.figure(figsize=(5, 5), dpi=80)
+        canvas2 = FigureCanvasTkAgg(cFigure, master=self)
+        canvas2.get_tk_widget().grid(row=2, column=2)
+        c = plt.gcf().subplots(1)
+        
+        c.cla()
+        c.plot(y_vals, x_vals)
+        cFigure.suptitle("SMRT3 Temperature")
+        
+
         
         
         self.protocol("WM_DELETE_WINDOW", self.on_close)
@@ -74,7 +99,7 @@ class App(tkinter.Tk):
 
 class SMRTWidget(tkinter.Frame):
     def __init__(self, parent, smrtText):
-        super().__init__(master = parent, bg='lightblue', padx=5, pady=5)
+        super().__init__(master = parent, padx=5, pady=5)
         
         smrtLabel = Label(self, text=smrtText, font='bold')
         
