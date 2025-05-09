@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "hardware/gpio.h"
 #include "hardware/adc.h"
+#include <tusb.h>
 
 #define PIN_S0 16
 #define PIN_S1 17
@@ -33,33 +34,131 @@ float getVoltageFromADC(){
     return voltage;
 }
 
-void mainloop(){
-    //select 0
-    //gpio_put(PIN_S0, 0);
-    //gpio_put(PIN_S1, 0);
-    //float dut1V = getVoltageFromADC();
+float getVoltageAsADC(){
+    float conversion_factor = 3.3f / (1 << 12);
+    float adc_value = adc_read();
+    return adc_value;
+}
+
+
+void sendSTART(){
+    printf("start\n");
+}
+
+void sendSMRT1Temp(){
 
     //select 1
-    //gpio_put(PIN_S0, 1);
-    //gpio_put(PIN_S1, 0);
-    //float dut2V = getVoltageFromADC();
+    gpio_put(PIN_S0, 1);
+    gpio_put(PIN_S1, 0);
+    float dut1V = getVoltageAsADC();
+    printf("smrt1t%hu\n", dut1V);
 
+}
+
+void sendSMRT1A(){
+    short temp = 42069;
+    printf("smrt13%hu\n", temp);
+}
+
+void sendSMRT1BPOS(){
+    short temp = 42069;
+    printf("smrt1+%hu\n", temp);
+}
+
+void sendSMRT1BNEG(){
+    short temp = 42069;
+    printf("smrt1-%hu\n", temp);
+}
+
+//asdsa
+
+void sendSMRT2Temp(){
     //select 2
-    //gpio_put(PIN_S0, 0);
-    //gpio_put(PIN_S1, 1);
-    
+    gpio_put(PIN_S0, 0);
+    gpio_put(PIN_S1, 1);
+    float dut2V = getVoltageAsADC();
+    printf("smrt2t%hu\n", dut2V);
+}
+
+void sendSMRT2A(){
+    short temp = 42069;
+    printf("smrt23%hu\n", temp);
+}
+
+void sendSMRT2BPOS(){
+    short temp = 42069;
+    printf("smrt2+%hu\n", temp);
+}
+
+void sendSMRT2BNEG(){
+    short temp = 42069;
+    printf("smrt2-%hu\n", temp);
+}
+
+//asdasdas
+
+void sendSMRT3Temp(){
     //select 3
     gpio_put(PIN_S0, 1);
     gpio_put(PIN_S1, 1);
-    float dut3V = getVoltageFromADC();
-    //float inputV = getVoltageFromADC();
+    float dut3V = getVoltageAsADC();
+    printf("smrt3t%hu\n", dut3V);
+}
 
-    //printf("\n----\ndut1V: %f\n", dut1V);
-    // printf("dut2V: %f\n", dut2V);
-    printf("dut3V: %f\n", dut3V);
-    // printf("inputV: %f\n", inputV);
+void sendSMRT3A(){
+    short temp = 42069;
+    printf("smrt33%hu\n", temp);
+}
 
-    sleep_ms(100);
+void sendSMRT3BPOS(){
+    short temp = 42069;
+    printf("smrt3+%hu\n", temp);
+}
+
+void sendSMRT3BNEG(){
+    short temp = 42069;
+    printf("smrt3+%hu\n", temp);
+}
+
+void sendEND(){
+    printf("end\n");
+}
+
+void mainloop(){
+
+    char inputBuffer[10];//"get\n"
+    fgets(inputBuffer, 10, stdin);
+    //printf("RAW DATA: %s\n", inputBuffer);
+    tud_cdc_read_flush();
+
+    if (inputBuffer[0] == 'g') {
+        //printf("69420\n");
+        sendSTART();
+
+        sendSMRT1Temp();
+        sendSMRT1A();
+        sendSMRT1BPOS();
+        sendSMRT1BNEG();
+
+        sendSMRT2Temp();
+        sendSMRT2A();
+        sendSMRT2BPOS();
+        sendSMRT2BNEG();
+
+        sendSMRT3Temp();
+        sendSMRT3A();
+        sendSMRT3BPOS();
+        sendSMRT3BNEG();
+
+        sendEND();
+
+    }
+
+
+
+
+    
+
 
 
 
