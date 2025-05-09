@@ -91,7 +91,6 @@ class App(tkinter.Tk):
         # Label(frame, text = "5.4")#.grid(row = 3, column = 1)
         
     def on_close(self):
-        print("asdasdasdsa")
         plt.close('all')
         self.destroy()
         sys.exit(0)
