@@ -19,7 +19,7 @@ def usbThreadEntry(dataQueue):
     while True:
         picoInterface.readData()
         picoInterface.convertData()
-        picoInterface.printData()
+        #picoInterface.printData()
         
         sendDataToGui(picoInterface, dataQueue)
         time.sleep(0.5)
@@ -44,20 +44,20 @@ def sendDataToGui(picoInterface, dataQueue):
 
 @dataclass
 class SMRTData:
-    smrt1Temp: int
-    smrt1A: int
-    smrt1BPOS: int
-    smrt1BNEG: int
+    smrt1Temp: float
+    smrt1A: float
+    smrt1BPOS: float
+    smrt1BNEG: float
     
-    smrt2Temp: int
-    smrt2A: int
-    smrt2BPOS: int
-    smrt2BNEG: int
+    smrt2Temp: float
+    smrt2A: float
+    smrt2BPOS: float
+    smrt2BNEG: float
     
-    smrt3Temp: int
-    smrt3A: int
-    smrt3BPOS: int
-    smrt3BNEG: int
+    smrt3Temp: float
+    smrt3A: float
+    smrt3BPOS: float
+    smrt3BNEG: float
         
 class PicoData:
     def __init__(self, connection):

@@ -3,14 +3,16 @@ import sys
 import usbThread
 import serial
 import threading
+from collections import deque
 
 
-app = gui.App()
 
 
+dataQueue = deque()
+app = gui.App(dataQueue)
 
 try:
-    usbThread = threading.Thread(target = usbThread.usbThreadEntry)
+    usbThread = threading.Thread(target = usbThread.usbThreadEntry, args=(dataQueue,))
     usbThread.daemon = True
     usbThread.start()
     

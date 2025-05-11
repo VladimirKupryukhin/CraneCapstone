@@ -11,6 +11,7 @@ from matplotlib.pyplot import figure
 from collections import deque
 from usbThread import SMRTData
 from collections import deque
+from matplotlib.animation import FuncAnimation
 
 
 class App(tkinter.Tk):
@@ -19,7 +20,7 @@ class App(tkinter.Tk):
         self.title("Crane Aerospace Capstone 2024-2025 Logger")    
         self.geometry("1000x500")
         
-        self.recordButton = Button(self, text = str("Record"))
+        self.recordButton = Button(self, text = str("Record"), command=self.button_clicked)
         self.recordButton.grid(row = 0, column = 0)
         
         self.grid_columnconfigure(0, weight=1)
@@ -39,92 +40,83 @@ class App(tkinter.Tk):
         self.smrt3.grid(row=1,column=2)
         
         plt.style.use('fivethirtyeight')
-        # values for first graph
-        x_vals = [1,2,3,4]
-        y_vals = [1,2,4,8]
-        
-        index = count()
         
         self.dataQueue:deque = dataQueue
+        self.data:SMRTData
         
-        
-        self.aFigureXVals = []
+        self.graphXVals = []
         self.aFigureYVals = []
-        self.aFigure = plt.figure(figsize=(5, 5), dpi=80)
+        self.bFigureYVals = []
+        self.cFigureYVals = []
+        
+        self.aFigure = plt.figure(figsize=(20, 5), dpi=60)
         self.canvas = FigureCanvasTkAgg(self.aFigure, master=self)
-        self.canvas.get_tk_widget().grid(row=2, column=0)
-        self.a = plt.gcf().subplots(1)
+        self.canvas.get_tk_widget().grid(row=2, column=0, columnspan=3, padx=10, pady=10)
+        self.a, self.b, self.c = self.aFigure.subplots(1,3)
         
-        # self.a.cla()
-        #self.a.plot(self.aFigureXVals, self.aFigureYVals)
-        self.aFigure.suptitle("SMRT1 Temperature")
+        self.a.set_title("SMRT 1 Temperature")
+        self.b.set_title("SMRT 2 Temperature")
+        self.c.set_title("SMRT 3 Temperature")
         
-        # bFigure = plt.figure(figsize=(5, 5), dpi=80)
-        # canvas2 = FigureCanvasTkAgg(bFigure, master=self)
-        # canvas2.get_tk_widget().grid(row=2, column=1)
-        # b = plt.gcf().subplots(1)
-        
-        # b.cla()
-        # b.plot(y_vals, x_vals)
-        # bFigure.suptitle("SMRT2 Temperature")
-        
-        # cFigure = plt.figure(figsize=(5, 5), dpi=80)
-        # canvas2 = FigureCanvasTkAgg(cFigure, master=self)
-        # canvas2.get_tk_widget().grid(row=2, column=2)
-        # c = plt.gcf().subplots(1)
-        
-        # c.cla()
-        # c.plot(y_vals, x_vals)
-        # cFigure.suptitle("SMRT3 Temperature")
-        
-
+        self.ani = FuncAnimation(plt.gcf(), self.animateGraphs, interval=1000, blit=False)
         
         
         self.protocol("WM_DELETE_WINDOW", self.on_close)
         
         self.after(ms=10, func=self.updateGuiData)
         
-        #frame = Frame(self, bg='lightblue', width=200, height=200)
-        # frame.grid(row = 2, column = 2)
+
+    def button_clicked(self):
+        print("Yessir button clicked")
+        
+    def animateGraphs(self, i):        
+        self.aFigureYVals.append(self.data.smrt1Temp)
+        self.bFigureYVals.append(self.data.smrt2Temp)
+        self.cFigureYVals.append(self.data.smrt3Temp)
+        self.graphXVals.append(i)        
         
         
-        # test1 = Label(master=frame, text = "Voltage", font="bold")
-        # test1.grid(row = 0, column = 0)
+        if len(self.aFigureYVals) == 21:
+            self.aFigureYVals.pop(0)
+            self.bFigureYVals.pop(0)
+            self.cFigureYVals.pop(0)
+            self.graphXVals.pop(0)
         
-        # test2 = Label(frame, text = "ADC Value")
-        # test2.grid(row = 1, column = 1)
+        self.a.cla()
+        self.a.set_title("SMRT 1 Temperature")
+        self.a.plot(self.graphXVals, self.aFigureYVals)
         
-        # Label(frame, text = "12345")#.grid(row = 2, column = 1)
-        # Label(frame, text = "Voltage Value")#.grid(row = 3, column = 0)
-        # Label(frame, text = "5.4")#.grid(row = 3, column = 1)
+        self.b.cla()
+        self.b.set_title("SMRT 2 Temperature")
+        self.b.plot(self.graphXVals, self.bFigureYVals)
+        
+        self.c.cla()
+        self.c.set_title("SMRT 3 Temperature")
+        self.c.plot(self.graphXVals, self.cFigureYVals)
+        
         
     def updateGuiData(self):
         try:
             #print("Before")
             
             if self.dataQueue:    
-                data:SMRTData = self.dataQueue.popleft()
+                self.data:SMRTData = self.dataQueue.popleft()
                 
-                self.smrt1.tempData["text"] = str(data.smrt1Temp)[:6]
-                self.smrt1.aOutData["text"] = str(data.smrt1A)[:6]
-                self.smrt1.bPosOutData["text"] = str(data.smrt1BPOS)[:6]
-                self.smrt1.bNegOutData["text"] = str(data.smrt1BNEG)[:6]
+                self.smrt1.tempData["text"] = str(self.data.smrt1Temp)[:6]
+                self.smrt1.aOutData["text"] = str(self.data.smrt1A)[:6]
+                self.smrt1.bPosOutData["text"] = str(self.data.smrt1BPOS)[:6]
+                self.smrt1.bNegOutData["text"] = str(self.data.smrt1BNEG)[:6]
                 
-                self.smrt2.tempData["text"] = str(data.smrt2Temp)[:6]
-                self.smrt2.aOutData["text"] = str(data.smrt2A)[:6]
-                self.smrt2.bPosOutData["text"] = str(data.smrt2BPOS)[:6]
-                self.smrt2.bNegOutData["text"] = str(data.smrt2BNEG)[:6]
+                self.smrt2.tempData["text"] = str(self.data.smrt2Temp)[:6]
+                self.smrt2.aOutData["text"] = str(self.data.smrt2A)[:6]
+                self.smrt2.bPosOutData["text"] = str(self.data.smrt2BPOS)[:6]
+                self.smrt2.bNegOutData["text"] = str(self.data.smrt2BNEG)[:6]
                 
-                self.smrt3.tempData["text"] = str(data.smrt3Temp)[:6]
-                self.smrt3.aOutData["text"] = str(data.smrt3A)[:6]
-                self.smrt3.bPosOutData["text"] = str(data.smrt3BPOS)[:6]
-                self.smrt3.bNegOutData["text"] = str(data.smrt3BNEG)[:6]
-                
-                self.aFigureYVals.append(data.smrt1Temp)
-                self.aFigureXVals.append(self.aFigureXVals.count + 1)
-                
-                self.a.cla()
-                self.a.plot(self.aFigureXVals, self.aFigureYVals)
+                self.smrt3.tempData["text"] = str(self.data.smrt3Temp)[:6]
+                self.smrt3.aOutData["text"] = str(self.data.smrt3A)[:6]
+                self.smrt3.bPosOutData["text"] = str(self.data.smrt3BPOS)[:6]
+                self.smrt3.bNegOutData["text"] = str(self.data.smrt3BNEG)[:6]
+    
 
             
             self.after(ms=10, func=self.updateGuiData)
