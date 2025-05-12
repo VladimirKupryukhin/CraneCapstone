@@ -50,23 +50,29 @@ void sendSMRT1Temp(){
     //select 1
     gpio_put(PIN_S0, 1);
     gpio_put(PIN_S1, 0);
-    float dut1V = getVoltageAsADC();
-    printf("smrt1t%hu\n", dut1V);
+    short dut1V = getVoltageAsADC();
+
+    if (dut1V == 0) {
+        printf("smrt1t0000\n");
+    }
+    else{
+        printf("smrt1t%hu\n", dut1V);
+    }
 
 }
 
 void sendSMRT1A(){
-    short temp = 42069;
+    short temp = 2910;
     printf("smrt13%hu\n", temp);
 }
 
 void sendSMRT1BPOS(){
-    short temp = 42069;
+    short temp = 2910;
     printf("smrt1+%hu\n", temp);
 }
 
 void sendSMRT1BNEG(){
-    short temp = 42069;
+    short temp = 2910;
     printf("smrt1-%hu\n", temp);
 }
 
@@ -76,22 +82,28 @@ void sendSMRT2Temp(){
     //select 2
     gpio_put(PIN_S0, 0);
     gpio_put(PIN_S1, 1);
-    float dut2V = getVoltageAsADC();
-    printf("smrt2t%hu\n", dut2V);
+    short dut2V = getVoltageAsADC();
+
+    if (dut2V == 0) {
+        printf("smrt2t0000\n");
+    }
+    else{
+        printf("smrt2t%hu\n", dut2V);
+    }
 }
 
 void sendSMRT2A(){
-    short temp = 42069;
+    short temp = 2910;
     printf("smrt23%hu\n", temp);
 }
 
 void sendSMRT2BPOS(){
-    short temp = 42069;
+    short temp = 2910;
     printf("smrt2+%hu\n", temp);
 }
 
 void sendSMRT2BNEG(){
-    short temp = 42069;
+    short temp = 2910;
     printf("smrt2-%hu\n", temp);
 }
 
@@ -101,22 +113,28 @@ void sendSMRT3Temp(){
     //select 3
     gpio_put(PIN_S0, 1);
     gpio_put(PIN_S1, 1);
-    float dut3V = getVoltageAsADC();
-    printf("smrt3t%hu\n", dut3V);
+    short dut3V = getVoltageAsADC();
+
+    if (dut3V == 0) {
+        printf("smrt3t0000\n");
+    }
+    else{
+        printf("smrt3t%hu\n", dut3V);
+    }
 }
 
 void sendSMRT3A(){
-    short temp = 42069;
+    short temp = 2910;
     printf("smrt33%hu\n", temp);
 }
 
 void sendSMRT3BPOS(){
-    short temp = 42069;
+    short temp = 2910;
     printf("smrt3+%hu\n", temp);
 }
 
 void sendSMRT3BNEG(){
-    short temp = 42069;
+    short temp = 2910;
     printf("smrt3+%hu\n", temp);
 }
 
