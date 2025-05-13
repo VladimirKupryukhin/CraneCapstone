@@ -2,6 +2,7 @@ import serial
 import time
 from serial.tools import list_ports
 from dataclasses import dataclass
+import math
 
 VID = 11914
 PID = 10
@@ -137,9 +138,24 @@ class PicoData:
         print("SMRT 3 BNEG: " + str(self.smrt3BNEG))
         
     def convertData(self):
+        
+        R0 = 1000
+        A = 0.0039083 
+        B = -0.0000005775
+        
+        
         self.smrt1Temp = (3.3 * int(self.smrt1Temp)) / 4096
+        I = (3.3 - self.smrt1Temp) / 1000
+        self.smrt1Temp = (-(R0 * A) + math.sqrt((R0 * A)*(R0 * A) - (4)*(R0*B)*(-(self.smrt1Temp / I)))) / (2 * R0 * B)
+        
         self.smrt2Temp = (3.3 * int(self.smrt2Temp)) / 4096
+        I = (3.3 - self.smrt2Temp) / 670
+        self.smrt1Temp = (-(R0 * A) + math.sqrt((R0 * A)*(R0 * A) - (4)*(R0*B)*(-(self.smrt2Temp / I)))) / (2 * R0 * B)
+        
         self.smrt3Temp = (3.3 * int(self.smrt3Temp)) / 4096
+        I = (3.3 - self.smrt3Temp) / 670
+        self.smrt1Temp = (-(R0 * A) + math.sqrt((R0 * A)*(R0 * A) - (4)*(R0*B)*(-(self.smrt3Temp / I)))) / (2 * R0 * B)
+        
         
         #self.smrt1A = (3.3 * int(self.smrt1A)) / 4096 
         pass

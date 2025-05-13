@@ -58,7 +58,7 @@ class App(tkinter.Tk):
         self.b.set_title("SMRT 2 Temperature")
         self.c.set_title("SMRT 3 Temperature")
         
-        self.ani = FuncAnimation(plt.gcf(), self.animateGraphs, interval=1000, blit=False)
+        self.ani = FuncAnimation(plt.gcf(), self.animateGraphs, interval=200, blit=False)
         
         
         self.protocol("WM_DELETE_WINDOW", self.on_close)
@@ -76,7 +76,7 @@ class App(tkinter.Tk):
         self.graphXVals.append(i)        
         
         
-        if len(self.aFigureYVals) == 21:
+        if len(self.aFigureYVals) == 121:
             self.aFigureYVals.pop(0)
             self.bFigureYVals.pop(0)
             self.cFigureYVals.pop(0)
