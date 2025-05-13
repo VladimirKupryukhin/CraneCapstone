@@ -1,6 +1,8 @@
 import tkinter
 from tkinter import *
 import sys
+import csv
+import time
 
 import random
 import matplotlib.pyplot as plt
@@ -22,6 +24,8 @@ class App(tkinter.Tk):
         
         self.recordButton = Button(self, text = str("Record"), command=self.button_clicked)
         self.recordButton.grid(row = 0, column = 0)
+        self.shouldRecord = False
+        self.epochTimeAtStart = 0
         
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
@@ -51,14 +55,14 @@ class App(tkinter.Tk):
         
         self.aFigure = plt.figure(figsize=(20, 5), dpi=60)
         self.canvas = FigureCanvasTkAgg(self.aFigure, master=self)
-        self.canvas.get_tk_widget().grid(row=2, column=0, columnspan=3, padx=10, pady=10)
+        self.canvas.get_tk_widget().grid(row=2, column=0, columnspan=3, padx=10, pady=10, stick="nsew")
         self.a, self.b, self.c = self.aFigure.subplots(1,3)
         
         self.a.set_title("SMRT 1 Temperature")
         self.b.set_title("SMRT 2 Temperature")
         self.c.set_title("SMRT 3 Temperature")
         
-        self.ani = FuncAnimation(plt.gcf(), self.animateGraphs, interval=200, blit=False)
+        self.ani = FuncAnimation(plt.gcf(), self.animateGraphs, interval=500, blit=False)
         
         
         self.protocol("WM_DELETE_WINDOW", self.on_close)
@@ -67,7 +71,49 @@ class App(tkinter.Tk):
         
 
     def button_clicked(self):
-        print("Yessir button clicked")
+        self.shouldRecord = not self.shouldRecord
+        
+        if self.shouldRecord == True:
+            self.recordButton.configure(bg="red", text = str("Recording"))
+            self.epochTimeAtStart = time.time()
+            
+            with open("smrt1Data.csv", "w", newline='') as csvfile:
+                mywriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+                
+                mywriter.writerow(['time', 'temperature', '3.3v out', 'POS 15v out', 'NEG 15v out'])
+                
+            with open("smrt2Data.csv", "w", newline='') as csvfile:
+                mywriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+                
+                mywriter.writerow(['time', 'temperature', '3.3v out', 'POS 15v out', 'NEG 15v out'])
+                
+            with open("smrt3Data.csv", "w", newline='') as csvfile:
+                mywriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+                
+                mywriter.writerow(['time', 'temperature', '3.3v out', 'POS 15v out', 'NEG 15v out'])
+                
+            self.after(ms=1000, func=self.writeDataToCSV)
+        else:
+            self.recordButton.configure(bg="green", text = str("Record"))
+        
+    def writeDataToCSV(self):
+        with open("smrt1Data.csv", "a", newline='') as csvfile:
+            mywriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            
+            mywriter.writerow([str(int(time.time() - self.epochTimeAtStart)), str(self.data.smrt1Temp), str(self.data.smrt1A), str(self.data.smrt1BPOS), str(self.data.smrt1BNEG)])
+            
+        with open("smrt2Data.csv", "a", newline='') as csvfile:
+            mywriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            
+            mywriter.writerow([str(int(time.time() - self.epochTimeAtStart)), str(self.data.smrt2Temp), str(self.data.smrt2A), str(self.data.smrt2BPOS), str(self.data.smrt2BNEG)])
+            
+        with open("smrt3Data.csv", "a", newline='') as csvfile:
+            mywriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            
+            mywriter.writerow([str(int(time.time() - self.epochTimeAtStart)), str(self.data.smrt3Temp), str(self.data.smrt3A), str(self.data.smrt3BPOS), str(self.data.smrt3BNEG)])
+            
+        if self.shouldRecord:
+            self.after(ms=1000, func=self.writeDataToCSV)
         
     def animateGraphs(self, i):        
         self.aFigureYVals.append(self.data.smrt1Temp)

@@ -3,27 +3,43 @@ import time
 from serial.tools import list_ports
 from dataclasses import dataclass
 import math
+import csv
 
 VID = 11914
 PID = 10
+
+PICO_COMMS_VOLTAGE_DROP = 0.055
 
 def usbThreadEntry(dataQueue):
     
     print("Starting USB Thread")
     
-    conn = serial.Serial(str(getCOMPort()), 115200)
-    #conn.timeout = 0.1
+    try:
+        conn = serial.Serial(str(getCOMPort()), 115200)
+    except:
+        print("FAILED TO CONNECT TO ADAPTER")
+        exit(0)
+        
     print(conn.name)
     
     picoInterface = PicoData(conn)
+    
+
+    
+    writeCounter = 0
     
     while True:
         picoInterface.readData()
         picoInterface.convertData()
         #picoInterface.printData()
-        
+    
         sendDataToGui(picoInterface, dataQueue)
-        time.sleep(0.5)
+        
+        # if writeCounter % 10 == 0:
+        #     picoInterface.writecsvRows()
+        #     writeCounter = 0
+        # writeCounter += 1
+        time.sleep(0.1)
         
 def sendDataToGui(picoInterface, dataQueue):
     data = SMRTData(
@@ -78,6 +94,7 @@ class PicoData:
         self.smrt3BNEG = -1
         
         self.conn = connection
+        
         
     def readData(self):
         get = "g\n"
@@ -144,17 +161,30 @@ class PicoData:
         B = -0.0000005775
         
         
-        self.smrt1Temp = (3.3 * int(self.smrt1Temp)) / 4096
+        self.smrt1Temp = (3.306 * int(self.smrt1Temp)) / 4096 + PICO_COMMS_VOLTAGE_DROP
         I = (3.3 - self.smrt1Temp) / 1000
-        self.smrt1Temp = (-(R0 * A) + math.sqrt((R0 * A)*(R0 * A) - (4)*(R0*B)*(-(self.smrt1Temp / I)))) / (2 * R0 * B)
+        radical = (R0 * A)*(R0 * A) - (4)*(R0*B)*(R0 - (self.smrt1Temp / I))
         
-        self.smrt2Temp = (3.3 * int(self.smrt2Temp)) / 4096
-        I = (3.3 - self.smrt2Temp) / 670
-        self.smrt1Temp = (-(R0 * A) + math.sqrt((R0 * A)*(R0 * A) - (4)*(R0*B)*(-(self.smrt2Temp / I)))) / (2 * R0 * B)
+        if radical > 0:
+            self.smrt1Temp = ((R0 * A * -1) + math.sqrt(radical)) / (2 * R0 * B)
         
-        self.smrt3Temp = (3.3 * int(self.smrt3Temp)) / 4096
-        I = (3.3 - self.smrt3Temp) / 670
-        self.smrt1Temp = (-(R0 * A) + math.sqrt((R0 * A)*(R0 * A) - (4)*(R0*B)*(-(self.smrt3Temp / I)))) / (2 * R0 * B)
+        #----
+        self.smrt2Temp = (3.306 * int(self.smrt2Temp)) / 4096 + PICO_COMMS_VOLTAGE_DROP
+        I = (3.3 - self.smrt2Temp) / 1000
+        radical = (R0 * A)*(R0 * A) - (4)*(R0*B)*(R0 - (self.smrt2Temp / I))
+        
+        if radical > 0:
+            self.smrt2Temp = ((R0 * A * -1) + math.sqrt(radical)) / (2 * R0 * B)
+        
+        #----
+        self.smrt3Temp = (3.306 * int(self.smrt3Temp)) / 4096 + PICO_COMMS_VOLTAGE_DROP
+        I = (3.3 - self.smrt3Temp) / 992
+        radical = (R0 * A)*(R0 * A) - (4)*(R0*B)*(R0 - (self.smrt3Temp / I))
+        
+        if radical > 0:
+            self.smrt3Temp = ((R0 * A * -1) + math.sqrt(radical)) / (2 * R0 * B)
+            
+        
         
         
         #self.smrt1A = (3.3 * int(self.smrt1A)) / 4096 
