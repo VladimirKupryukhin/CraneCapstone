@@ -1,2 +1,2 @@
 mkdir build
-cmake . -B ./build
+cmake . -B ./build 

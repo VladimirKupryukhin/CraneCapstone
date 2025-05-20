@@ -8,7 +8,7 @@
 #define PIN_DUT3_RTD_ADC_CS 10
 #define PIN_DUT2_RTD_ADC_CS 11
 #define PIN_DUT1_RTD_ADC_CS 12
-#define PIN_CONVERT
+#define PIN_CONVERT 13
 
 #define PIN_MY_MISO 16
 #define PIN_MY_SCK 18

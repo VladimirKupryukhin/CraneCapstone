@@ -1,8 +1,10 @@
 #ifndef MYADC_H
 #define MYADC_H
 
-#include <stdlib.h>
+#include "../include/constants.h"
 #include "pico/stdlib.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 
 struct ADC_RESULT {
@@ -21,9 +23,10 @@ struct ADC_RESULT {
  */
 struct ADC_RESULT* readADC(int target);
 
+void adcIdleBus();
 void adcInitConvo();
 void adcConversion();
-short readADCBits();
+short readADCBits(int target);
 
 
 
