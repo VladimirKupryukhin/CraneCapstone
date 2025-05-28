@@ -119,6 +119,8 @@ class PicoData:
         
         self.conn.read_until("\r\n".encode('utf-8'))
         
+        
+        
         self.processData()
         
     def processData(self):
@@ -136,6 +138,8 @@ class PicoData:
         self.smrt3A = self.smrt3A[6:-2]
         self.smrt3BPOS = self.smrt3BPOS[6:-2]
         self.smrt3BNEG = self.smrt3BNEG[6:-2]
+        
+        #print("SMRT3 ADC " + str(self.smrt3Temp))
         
     def printData(self):
         print("\n----")
@@ -162,29 +166,32 @@ class PicoData:
         
         
         self.smrt1Temp = (3.306 * int(self.smrt1Temp)) / 4096 + PICO_COMMS_VOLTAGE_DROP
-        I = (3.3 - self.smrt1Temp) / 1000
+        #print(self.smrt1Temp)
+        I = (3.3 - self.smrt1Temp) / 1150
         radical = (R0 * A)*(R0 * A) - (4)*(R0*B)*(R0 - (self.smrt1Temp / I))
         
         if radical > 0:
             self.smrt1Temp = ((R0 * A * -1) + math.sqrt(radical)) / (2 * R0 * B)
         
         #----
-        self.smrt2Temp = (3.306 * int(self.smrt2Temp)) / 4096 + PICO_COMMS_VOLTAGE_DROP
-        I = (3.3 - self.smrt2Temp) / 1000
+        self.smrt2Temp = (3.306 * int(self.smrt2Temp)) / 4096 + PICO_COMMS_VOLTAGE_DROP + 0.02
+        #print(self.smrt2Temp)
+        I = (3.3 - self.smrt2Temp) / 1150
         radical = (R0 * A)*(R0 * A) - (4)*(R0*B)*(R0 - (self.smrt2Temp / I))
         
         if radical > 0:
             self.smrt2Temp = ((R0 * A * -1) + math.sqrt(radical)) / (2 * R0 * B)
         
         #----
-        self.smrt3Temp = (3.306 * int(self.smrt3Temp)) / 4096 + PICO_COMMS_VOLTAGE_DROP
-        I = (3.3 - self.smrt3Temp) / 992
+        self.smrt3Temp = (3.306 * int(self.smrt3Temp)) / 4096 + PICO_COMMS_VOLTAGE_DROP + 0.01
+        #print(self.smrt3Temp)
+        I = (3.3 - self.smrt3Temp) / 1150
         radical = (R0 * A)*(R0 * A) - (4)*(R0*B)*(R0 - (self.smrt3Temp / I))
         
         if radical > 0:
             self.smrt3Temp = ((R0 * A * -1) + math.sqrt(radical)) / (2 * R0 * B)
             
-        
+        print("\n")
         
         
         #self.smrt1A = (3.3 * int(self.smrt1A)) / 4096 
