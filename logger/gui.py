@@ -15,6 +15,19 @@ from usbThread import SMRTData
 from collections import deque
 from matplotlib.animation import FuncAnimation
 
+logicData:SMRTData = SMRTData(
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1)
 
 class App(tkinter.Tk):
     def __init__(self, dataQueue):
@@ -46,12 +59,12 @@ class App(tkinter.Tk):
         plt.style.use('fivethirtyeight')
         
         self.dataQueue:deque = dataQueue
-        self.data:SMRTData
+        #self.logicData:SMRTData
         
-        self.graphXVals = []
-        self.aFigureYVals = []
-        self.bFigureYVals = []
-        self.cFigureYVals = []
+        self.graphXVals = [0]
+        self.aFigureYVals = [0]
+        self.bFigureYVals = [0]
+        self.cFigureYVals = [0]
         
         self.aFigure = plt.figure(figsize=(20, 5), dpi=60)
         self.canvas = FigureCanvasTkAgg(self.aFigure, master=self)
@@ -62,7 +75,7 @@ class App(tkinter.Tk):
         self.b.set_title("SMRT 2 Temperature")
         self.c.set_title("SMRT 3 Temperature")
         
-        self.ani = FuncAnimation(plt.gcf(), self.animateGraphs, interval=500, blit=False)
+        self.ani = FuncAnimation(plt.gcf(), self.animateGraphs, interval=500, blit=False, cache_frame_data=False)
         
         
         self.protocol("WM_DELETE_WINDOW", self.on_close)
@@ -97,28 +110,30 @@ class App(tkinter.Tk):
             self.recordButton.configure(bg="green", text = str("Record"))
         
     def writeDataToCSV(self):
+        global logicData
         with open("smrt1Data.csv", "a", newline='') as csvfile:
             mywriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             
-            mywriter.writerow([str(int(time.time() - self.epochTimeAtStart)), str(self.data.smrt1Temp), str(self.data.smrt1A), str(self.data.smrt1BPOS), str(self.data.smrt1BNEG)])
+            mywriter.writerow([str(int(time.time() - self.epochTimeAtStart)), str(logicData.smrt1Temp), str(logicData.smrt1A), str(logicData.smrt1BPOS), str(logicData.smrt1BNEG)])
             
         with open("smrt2Data.csv", "a", newline='') as csvfile:
             mywriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             
-            mywriter.writerow([str(int(time.time() - self.epochTimeAtStart)), str(self.data.smrt2Temp), str(self.data.smrt2A), str(self.data.smrt2BPOS), str(self.data.smrt2BNEG)])
+            mywriter.writerow([str(int(time.time() - self.epochTimeAtStart)), str(logicData.smrt2Temp), str(logicData.smrt2A), str(logicData.smrt2BPOS), str(logicData.smrt2BNEG)])
             
         with open("smrt3Data.csv", "a", newline='') as csvfile:
             mywriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             
-            mywriter.writerow([str(int(time.time() - self.epochTimeAtStart)), str(self.data.smrt3Temp), str(self.data.smrt3A), str(self.data.smrt3BPOS), str(self.data.smrt3BNEG)])
+            mywriter.writerow([str(int(time.time() - self.epochTimeAtStart)), str(logicData.smrt3Temp), str(logicData.smrt3A), str(logicData.smrt3BPOS), str(logicData.smrt3BNEG)])
             
         if self.shouldRecord:
             self.after(ms=1000, func=self.writeDataToCSV)
         
-    def animateGraphs(self, i):        
-        self.aFigureYVals.append(self.data.smrt1Temp)
-        self.bFigureYVals.append(self.data.smrt2Temp)
-        self.cFigureYVals.append(self.data.smrt3Temp)
+    def animateGraphs(self, i):    
+        global logicData    
+        self.aFigureYVals.append(logicData.smrt1Temp)
+        self.bFigureYVals.append(logicData.smrt2Temp)
+        self.cFigureYVals.append(logicData.smrt3Temp)
         self.graphXVals.append(i)        
         
         
@@ -142,26 +157,27 @@ class App(tkinter.Tk):
         
         
     def updateGuiData(self):
+        global logicData
         try:
             #print("Before")
             
             if self.dataQueue:    
-                self.data:SMRTData = self.dataQueue.popleft()
+                logicData:SMRTData = self.dataQueue.popleft()
                 
-                self.smrt1.tempData["text"] = str(self.data.smrt1Temp)[:6]
-                self.smrt1.aOutData["text"] = str(self.data.smrt1A)[:6]
-                self.smrt1.bPosOutData["text"] = str(self.data.smrt1BPOS)[:6]
-                self.smrt1.bNegOutData["text"] = str(self.data.smrt1BNEG)[:6]
+                self.smrt1.tempData["text"] = str(logicData.smrt1Temp)[:6]
+                self.smrt1.aOutData["text"] = str(logicData.smrt1A)[:6]
+                self.smrt1.bPosOutData["text"] = str(logicData.smrt1BPOS)[:6]
+                self.smrt1.bNegOutData["text"] = str(logicData.smrt1BNEG)[:6]
                 
-                self.smrt2.tempData["text"] = str(self.data.smrt2Temp)[:6]
-                self.smrt2.aOutData["text"] = str(self.data.smrt2A)[:6]
-                self.smrt2.bPosOutData["text"] = str(self.data.smrt2BPOS)[:6]
-                self.smrt2.bNegOutData["text"] = str(self.data.smrt2BNEG)[:6]
+                self.smrt2.tempData["text"] = str(logicData.smrt2Temp)[:6]
+                self.smrt2.aOutData["text"] = str(logicData.smrt2A)[:6]
+                self.smrt2.bPosOutData["text"] = str(logicData.smrt2BPOS)[:6]
+                self.smrt2.bNegOutData["text"] = str(logicData.smrt2BNEG)[:6]
                 
-                self.smrt3.tempData["text"] = str(self.data.smrt3Temp)[:6]
-                self.smrt3.aOutData["text"] = str(self.data.smrt3A)[:6]
-                self.smrt3.bPosOutData["text"] = str(self.data.smrt3BPOS)[:6]
-                self.smrt3.bNegOutData["text"] = str(self.data.smrt3BNEG)[:6]
+                self.smrt3.tempData["text"] = str(logicData.smrt3Temp)[:6]
+                self.smrt3.aOutData["text"] = str(logicData.smrt3A)[:6]
+                self.smrt3.bPosOutData["text"] = str(logicData.smrt3BPOS)[:6]
+                self.smrt3.bNegOutData["text"] = str(logicData.smrt3BNEG)[:6]
     
 
             

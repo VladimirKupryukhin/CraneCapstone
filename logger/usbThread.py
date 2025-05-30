@@ -8,7 +8,7 @@ import csv
 VID = 11914
 PID = 10
 
-PICO_COMMS_VOLTAGE_DROP = 0.055
+PICO_COMMS_VOLTAGE_DROP = -0.12
 
 def usbThreadEntry(dataQueue):
     
@@ -97,47 +97,51 @@ class PicoData:
         
         
     def readData(self):
+        #print("ahhhh")
         get = "g\n"
         self.conn.write(get.encode('utf-8'))
         
-        self.conn.read_until("\r\n".encode('utf-8'))
+        self.conn.read_until("\n".encode('utf-8'))
         
-        self.smrt1Temp = self.conn.read_until("\r\n".encode('utf-8')).decode("utf-8")
-        self.smrt1A = self.conn.read_until("\r\n".encode('utf-8')).decode("utf-8")
-        self.smrt1BPOS = self.conn.read_until("\r\n".encode('utf-8')).decode("utf-8")
-        self.smrt1BNEG = self.conn.read_until("\r\n".encode('utf-8')).decode("utf-8")
+        self.smrt1Temp = self.conn.read_until("\n".encode('utf-8')).decode("utf-8")
+        self.smrt1A = self.conn.read_until("\n".encode('utf-8')).decode("utf-8")
+        self.smrt1BPOS = self.conn.read_until("\n".encode('utf-8')).decode("utf-8")
+        self.smrt1BNEG = self.conn.read_until("\n".encode('utf-8')).decode("utf-8")
         
-        self.smrt2Temp = self.conn.read_until("\r\n".encode('utf-8')).decode("utf-8")
-        self.smrt2A = self.conn.read_until("\r\n".encode('utf-8')).decode("utf-8")
-        self.smrt2BPOS = self.conn.read_until("\r\n".encode('utf-8')).decode("utf-8")
-        self.smrt2BNEG = self.conn.read_until("\r\n".encode('utf-8')).decode("utf-8")
+        self.smrt2Temp = self.conn.read_until("\n".encode('utf-8')).decode("utf-8")
+        self.smrt2A = self.conn.read_until("\n".encode('utf-8')).decode("utf-8")
+        self.smrt2BPOS = self.conn.read_until("\n".encode('utf-8')).decode("utf-8")
+        self.smrt2BNEG = self.conn.read_until("\n".encode('utf-8')).decode("utf-8")
         
-        self.smrt3Temp = self.conn.read_until("\r\n".encode('utf-8')).decode("utf-8")
-        self.smrt3A = self.conn.read_until("\r\n".encode('utf-8')).decode("utf-8")
-        self.smrt3BPOS = self.conn.read_until("\r\n".encode('utf-8')).decode("utf-8")
-        self.smrt3BNEG = self.conn.read_until("\r\n".encode('utf-8')).decode("utf-8")
+        self.smrt3Temp = self.conn.read_until("\n".encode('utf-8')).decode("utf-8")
+        self.smrt3A = self.conn.read_until("\n".encode('utf-8')).decode("utf-8")
+        self.smrt3BPOS = self.conn.read_until("\n".encode('utf-8')).decode("utf-8")
+        self.smrt3BNEG = self.conn.read_until("\n".encode('utf-8')).decode("utf-8")
         
-        self.conn.read_until("\r\n".encode('utf-8'))
         
+        
+        self.conn.read_until("\n".encode('utf-8'))
         
         
         self.processData()
         
     def processData(self):
-        self.smrt1Temp = self.smrt1Temp[6:-2]
+        self.smrt1Temp = self.smrt1Temp[6:-1]
         self.smrt1A = self.smrt1A[6:-2]
         self.smrt1BPOS = self.smrt1BPOS[6:-2]
         self.smrt1BNEG = self.smrt1BNEG[6:-2]
         
-        self.smrt2Temp = self.smrt2Temp[6:-2]
+        self.smrt2Temp = self.smrt2Temp[6:-1]
         self.smrt2A = self.smrt2A[6:-2]
-        self.smrt2BPOS = self.smrt2BPOS[6:-2]
+        self.smrt2BPOS = self.smrt2BPOS[6:-1]
         self.smrt2BNEG = self.smrt2BNEG[6:-2]
         
-        self.smrt3Temp = self.smrt3Temp[6:-2]
+        self.smrt3Temp = self.smrt3Temp[6:-1]
         self.smrt3A = self.smrt3A[6:-2]
-        self.smrt3BPOS = self.smrt3BPOS[6:-2]
-        self.smrt3BNEG = self.smrt3BNEG[6:-2]
+        self.smrt3BPOS = self.smrt3BPOS[6:-1]
+        self.smrt3BNEG = self.smrt3BNEG[6:-1]
+        
+        #print(self.smrt1Temp)
         
         #print("SMRT3 ADC " + str(self.smrt3Temp))
         
@@ -174,7 +178,7 @@ class PicoData:
             self.smrt1Temp = ((R0 * A * -1) + math.sqrt(radical)) / (2 * R0 * B)
         
         #----
-        self.smrt2Temp = (3.306 * int(self.smrt2Temp)) / 4096 + PICO_COMMS_VOLTAGE_DROP + 0.02
+        self.smrt2Temp = (3.306 * int(self.smrt2Temp)) / 4096 + PICO_COMMS_VOLTAGE_DROP - 0.00
         #print(self.smrt2Temp)
         I = (3.3 - self.smrt2Temp) / 1150
         radical = (R0 * A)*(R0 * A) - (4)*(R0*B)*(R0 - (self.smrt2Temp / I))
@@ -183,7 +187,7 @@ class PicoData:
             self.smrt2Temp = ((R0 * A * -1) + math.sqrt(radical)) / (2 * R0 * B)
         
         #----
-        self.smrt3Temp = (3.306 * int(self.smrt3Temp)) / 4096 + PICO_COMMS_VOLTAGE_DROP + 0.01
+        self.smrt3Temp = (3.306 * int(self.smrt3Temp)) / 4096 + PICO_COMMS_VOLTAGE_DROP
         #print(self.smrt3Temp)
         I = (3.3 - self.smrt3Temp) / 1150
         radical = (R0 * A)*(R0 * A) - (4)*(R0*B)*(R0 - (self.smrt3Temp / I))
@@ -191,7 +195,7 @@ class PicoData:
         if radical > 0:
             self.smrt3Temp = ((R0 * A * -1) + math.sqrt(radical)) / (2 * R0 * B)
             
-        print("\n")
+        #print("\n")
         
         
         #self.smrt1A = (3.3 * int(self.smrt1A)) / 4096 
